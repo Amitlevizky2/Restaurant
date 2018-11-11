@@ -43,7 +43,7 @@ std::string VegetarianCustomer::toString() const {return "";}//TODO: toString
 
 
 //CheapCustomer class
-CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id), ordered(false), cheapest(1000){
+CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id), ordered(false), cheapest(INT8_MAX){
 }
 
 std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
@@ -58,7 +58,7 @@ std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
         }
     }
 
-    if (menu[cheapest].getId() < 1000)
+    if (menu[cheapest].getId() < INT8_MAX)
         return std::vector<int>(cheapest);
     return std::vector<int>();
 }
@@ -68,7 +68,7 @@ std::string CheapCustomer::toString() const {return "";}//TODO: toString
 //End of CheapCustomer class
 
 //SpicyCustomer class
-SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX) ordered(false){
+SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX), ordered(false){
 }
 
 std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
