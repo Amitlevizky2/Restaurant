@@ -51,8 +51,11 @@ public:
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
 private:
-    int spcMstExp;
-    
+    int spcMstExpInx;
+    int spcPrice;
+    int bvgMstChpstInx;
+    int bvgPrice;
+    bool ordered;
 };
 
 
@@ -62,6 +65,7 @@ public:
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
 private:
+
 };
 
 

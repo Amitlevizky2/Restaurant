@@ -68,5 +68,32 @@ std::string CheapCustomer::toString() const {return "";}//TODO: toString
 //End of CheapCustomer class
 
 //SpicyCustomer class
-SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id){
+SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX) ordered(false){
 }
+
+std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
+    if (!ordered) {
+        for (int i = 0; i < menu.size(); ++i) {
+            if (menu[i].getType() == SPC && menu[i].getPrice() > spcPrice) {
+                spcPrice = menu[i].getPrice();
+                spcMstExpInx = i;
+            }
+
+            if (menu[i].getType() == BVG && menu[i].getPrice() < bvgPrice) {
+                bvgPrice = menu[i].getPrice();
+                bvgMstChpstInx = i;
+            }
+
+        }
+        ordered = true;
+    }
+    if(spcMstExpInx < INT8_MAX && bvgMstChpstInx < INT8_MAX)
+        return std::vector<int>(spcMstExpInx, bvgMstChpstInx);
+    else if (spcMstExpInx < INT8_MAX && bvgMstChpstInx == INT8_MAX)
+        return std::vector<int>(spcMstExpInx);
+    else
+        return std::vector<int>();
+
+}
+
+std::string SpicyCustomer::toString() const {return "";}//TODO: toString
