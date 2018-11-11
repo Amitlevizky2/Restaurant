@@ -74,12 +74,12 @@ SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spc
 std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
     if (!ordered) {
         for (int i = 0; i < menu.size(); ++i) {
-            if (menu[i].getType() == SPC && menu[i].getPrice() > spcPrice) {
+            if (menu[i].getType() == SPC && menu[i].getPrice() >= spcPrice) {
                 spcPrice = menu[i].getPrice();
                 spcMstExpInx = i;
             }
 
-            if (menu[i].getType() == BVG && menu[i].getPrice() < bvgPrice) {
+            if (menu[i].getType() == BVG && menu[i].getPrice() <= bvgPrice) {
                 bvgPrice = menu[i].getPrice();
                 bvgMstChpstInx = i;
             }

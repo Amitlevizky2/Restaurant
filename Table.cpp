@@ -5,7 +5,7 @@
 #include "Table.h"
 #include <iostream>
 
-Table::Table(int t_capacity) : capacity(t_capacity), open(false) {}
+Table::Table(int t_capacity) : capacity(t_capacity), open(false), customersList(), orderList(), totalBill(0) {}
 
 int Table::getCapacity() const {return capacity;}
 
@@ -14,22 +14,25 @@ void Table::addCustomer(Customer *customer) {
 }
 
 void Table::removeCustomer(int id) {
-    Customer* temp = getCustomer(id);
-    if (temp == nullptr)
-        std::cout << "There is no Customer with this id in this table!";
-    else
+    for (int i = 0; i < customersList.size(); ++i) {
+        if(customersList[i]->getId() == id ) {
+            customersList.erase(customersList.begin() + i);
+        }
 
+        for (int j = 0; j < orderList.size(); ++j) {
+            if(orderList[i].first == id)
+                orderList.erase(orderList.begin() + i);
+        }
+    }
 }
 
 Customer* Table::getCustomer(int id) {
     for (int i = 0; i < customersList.size(); ++i) {
         if (customersList[i]->getId() == id)
             return customersList[i];
-        return nullptr;
     }
+    return nullptr;
 }
-
-bool Table::isOpen() { return open;}
 
 std::vector<Customer*>& Table::getCustomers() {return customersList;}
 
@@ -40,7 +43,9 @@ void Table::order(const std::vector<Dish> &menu) {
         Customer* currentCustomer = customersList[i];
         std::vector <int> ordrByCtr = currentCustomer[i].order(menu);
         for (int j = 0; j < ordrByCtr.size(); ++j) {
-            orderList.push_back(std::make_pair(currentCustomer[i], menu[ordrByCtr[j]]));
+            OrderPair newOrdByCtr(currentCustomer[i].getId(), menu[ordrByCtr[j]]);
+            orderList.push_back(newOrdByCtr);
+            totalBill = totalBill + menu[ordrByCtr[j]].getPrice();
         }
     }
 }
@@ -49,6 +54,14 @@ void Table::openTable() {
     open = true;
 }
 
-void Table::closeTable() {}
+void Table::closeTable() {
+    for (int i = 0; i < customersList.size(); ++i) {
+        delete customersList[i];
+    }
+    customersList.clear();
+    open=false;
+}
 
-int Table::getBill() {}
+int Table::getBill() { return totalBill;}
+
+bool Table::isOpen() { return open;}
