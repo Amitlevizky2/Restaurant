@@ -48,6 +48,7 @@ OpenTable::~OpenTable()
     for (int i = 0; i < customers.size(); ++i)
     {
         delete customers[i];
+        customers[i] = nullptr;
     }
 }
 
