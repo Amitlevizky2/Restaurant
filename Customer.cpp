@@ -5,8 +5,9 @@
 #include "Customer.h"
 
 //Base Customer class
-Customer::Customer(std::string c_name, int c_id) : name(c_name), id(c_id) {
-}
+Customer::Customer(std::string c_name, int c_id) : name(c_name), id(c_id) {}
+
+Customer::~Customer() {}
 
 std::string Customer::getName() const { return name;}
 
@@ -14,10 +15,14 @@ int Customer::getId() const { return id;}
 
 //End Base Customer class
 
+
+
 //VegetarianCustomer class
 
 VegetarianCustomer::VegetarianCustomer(std::string name, int id) : Customer(name, id), mstExpBvg(-1), smllstIdVeg(1000), findAndLeg(false) {
 }
+
+VegetarianCustomer::~VegetarianCustomer() {}
 
 std::vector<int> VegetarianCustomer::order(const std::vector<Dish> &menu) {
     if (!findAndLeg) {
@@ -37,14 +42,20 @@ std::vector<int> VegetarianCustomer::order(const std::vector<Dish> &menu) {
     return std::vector<int>();
 }
 
-std::string VegetarianCustomer::toString() const {return "";}//TODO: toString
+std::string VegetarianCustomer::toString() const {return "";}//TODO:
+
+
+Customer* VegetarianCustomer::clone() {return new VegetarianCustomer(*this);}
 
 //End of VegetarianCustomer class
+
 
 
 //CheapCustomer class
 CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id), ordered(false), cheapest(INT8_MAX){
 }
+
+CheapCustomer::~CheapCustomer() {}
 
 std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
     if (!ordered)
@@ -65,11 +76,15 @@ std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
 
 std::string CheapCustomer::toString() const {return "";}//TODO: toString
 
+
+Customer* CheapCustomer::clone() {return new CheapCustomer(*this);}
 //End of CheapCustomer class
 
 //SpicyCustomer class
 SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX), ordered(false){
 }
+
+SpicyCustomer::~SpicyCustomer() {}
 
 std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
     if (!ordered) {
@@ -97,3 +112,6 @@ std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
 }
 
 std::string SpicyCustomer::toString() const {return "";}//TODO: toString
+
+
+Customer* SpicyCustomer::clone() {return new SpicyCustomer(*this);}

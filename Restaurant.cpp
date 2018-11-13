@@ -14,7 +14,7 @@ int Restaurant::getNumOfTables() const {
 }
 
 Table* Restaurant::getTable(int ind) {
-    if (ind < 0 || ind > tables.size())
+    if (!(ind > tables.size() || ind < 0))
         return tables[ind];
     return nullptr;
 }

@@ -18,7 +18,6 @@ void Table::removeCustomer(int id) {
         if(customersList[i]->getId() == id ) {
             customersList.erase(customersList.begin() + i);
         }
-
         for (int j = 0; j < orderList.size(); ++j) {
             if(orderList[i].first == id)
                 orderList.erase(orderList.begin() + i);
@@ -59,7 +58,9 @@ void Table::closeTable() {
         delete customersList[i];
     }
     customersList.clear();
+    orderList.clear();
     open=false;
+    totalBill = 0;
 }
 
 int Table::getBill() { return totalBill;}
