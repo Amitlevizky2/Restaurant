@@ -15,15 +15,17 @@ void Table::addCustomer(Customer *customer) {
 
 void Table::removeCustomer(int id) {
     for (int i = 0; i < customersList.size(); ++i) {
-        if(customersList[i]->getId() == id ) {
+        if(customersList.at(i)->getId() == id ) {
             customersList.erase(customersList.begin() + i);
         }
+
+        std::vector<OrderPair> newPairOrderList;
         for (int j = 0; j < orderList.size(); ++j) {
-            if(orderList[i].first == id) {
-                totalBill = totalBill - orderList[i].second.getPrice();
-                orderList.erase(orderList.begin() + i);
+            if (!newPairOrderList.at(j).first != id){
+                newPairOrderList.push_back(orderList.at(j));
             }
         }
+        orderList = std::move(newPairOrderList);
     }
 }
 
@@ -41,10 +43,10 @@ std::vector<OrderPair>& Table::getOrders() { return orderList;}
 
 void Table::order(const std::vector<Dish> &menu) {
     for (int i = 0; i < customersList.size(); ++i) {
-        Customer* currentCustomer = customersList[i];
-        std::vector <int> ordrByCtr = currentCustomer[i].order(menu);
+        Customer* currentCustomer = customersList.at(i);
+        std::vector <int> ordrByCtr = currentCustomer->order(menu);
         for (int j = 0; j < ordrByCtr.size(); ++j) {
-            OrderPair newOrdByCtr(currentCustomer[i].getId(), menu[ordrByCtr[j]]);
+            OrderPair newOrdByCtr(currentCustomer->getId(), menu.at(ordrByCtr.at(j)));
             orderList.push_back(newOrdByCtr);
             totalBill = totalBill + menu[ordrByCtr[j]].getPrice();
         }
@@ -60,7 +62,7 @@ void Table::closeTable() {
         delete customersList[i];
     }
     customersList.clear();
-    orderList.clear();
+    //orderList.clear();
     open=false;
     totalBill = 0;
 }

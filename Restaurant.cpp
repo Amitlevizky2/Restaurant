@@ -2,6 +2,7 @@
 // Created by Amit Levizky on 11/3/18.
 //
 #include "Restaurant.h"
+#include <vector>
 #include <iostream>
 #include <fstream>
 
@@ -45,8 +46,6 @@ Restaurant &Restaurant::operator=(const Restaurant &other) {
     if (this == &other)
         return *this;
     open = other.open;
-    menu.clear();
-    menu = other.menu;
     for (int i = 0; i < other.tables.size(); ++i)
     {
         delete tables[i];
@@ -74,8 +73,8 @@ Restaurant &Restaurant::operator=(Restaurant &&other) {
     if (this == &other)
         return *this;
     open = other.open;
-    menu.clear();
-    menu = other.menu;
+    //menu.clear();
+    menu = std::move(other.menu);
     for (int i = 0; i < tables.size(); ++i)
     {
         delete tables[i];
@@ -89,6 +88,7 @@ Restaurant &Restaurant::operator=(Restaurant &&other) {
     }
     actionsLog.clear();
     actionsLog = other.actionsLog;
+    return *this;
 }
 
 void Restaurant::start(){}

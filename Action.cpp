@@ -127,7 +127,8 @@ void MoveCustomer::act(Restaurant &restaurant) {
     {
         std::vector<int> customerOrders = getCustomerOrderList(id, srcTable, restaurant);//Get the orders of the customer from the source table
         for (int i = 0; i < customerOrders.size(); ++i) {
-            destination->getOrders().push_back(id, restaurant.getMenu()[customerOrders[i]]);
+            OrderPair a(id,restaurant.getMenu()[customerOrders.at(i)]);
+            destination->getOrders().push_back(a);
         }
         destination->getCustomers().push_back(source->getCustomer(id));//Move the customer to the destination table
         source->removeCustomer(id);//Remove the customer from the source table
@@ -215,10 +216,9 @@ PrintMenu::PrintMenu() : BaseAction() {}
 
 void PrintMenu::act(Restaurant &restaurant)
 {
-    menu = restaurant.getMenu();
-    for (int i = 0; i < menu.size(); ++i)
+    for (int i = 0; i < restaurant.getMenu().size(); ++i)
     {
-        std::cout << menu[i].getName() << " " << menu[i].getType() << " " << menu[i].getPrice() << "NIS";
+        std::cout << restaurant.getMenu()[i].getName() << " " << restaurant.getMenu()[i].getType() << " " << restaurant.getMenu()[i].getPrice() << "NIS";
     }
     complete();
 }
