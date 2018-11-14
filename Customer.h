@@ -66,6 +66,11 @@ public:
     std::string toString() const;
 private:
 
+    int curr;
+    int minAlc;
+    int alcChipInx;
+    bool ordered;
+    std::vector<int> alcDishes;
 };
 
 
