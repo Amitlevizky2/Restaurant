@@ -3,11 +3,10 @@
 //
 
 #include "Customer.h"
-
+#include <algorithm>
 //Base Customer class
-Customer::Customer(std::string c_name, int c_id) : name(c_name), id(c_id) {}
-
-Customer::~Customer() {}
+Customer::Customer(std::string c_name, int c_id) : name(c_name), id(c_id) {
+}
 
 std::string Customer::getName() const { return name;}
 
@@ -15,14 +14,10 @@ int Customer::getId() const { return id;}
 
 //End Base Customer class
 
-
-
 //VegetarianCustomer class
 
 VegetarianCustomer::VegetarianCustomer(std::string name, int id) : Customer(name, id), mstExpBvg(-1), smllstIdVeg(1000), findAndLeg(false) {
 }
-
-VegetarianCustomer::~VegetarianCustomer() {}
 
 std::vector<int> VegetarianCustomer::order(const std::vector<Dish> &menu) {
     if (!findAndLeg) {
@@ -42,20 +37,14 @@ std::vector<int> VegetarianCustomer::order(const std::vector<Dish> &menu) {
     return std::vector<int>();
 }
 
-std::string VegetarianCustomer::toString() const {return "";}//TODO:
-
-
-Customer* VegetarianCustomer::clone() {return new VegetarianCustomer(*this);}
+std::string VegetarianCustomer::toString() const {return "";}//TODO: toString
 
 //End of VegetarianCustomer class
-
 
 
 //CheapCustomer class
 CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id), ordered(false), cheapest(INT8_MAX){
 }
-
-CheapCustomer::~CheapCustomer() {}
 
 std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
     if (!ordered)
@@ -67,6 +56,7 @@ std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
             if (menu[i].getPrice() < menu[cheapest].getPrice())
                 cheapest = menu[i].getId();
         }
+        ordered =  true;
     }
 
     if (menu[cheapest].getId() < INT8_MAX)
@@ -76,15 +66,11 @@ std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
 
 std::string CheapCustomer::toString() const {return "";}//TODO: toString
 
-
-Customer* CheapCustomer::clone() {return new CheapCustomer(*this);}
 //End of CheapCustomer class
 
 //SpicyCustomer class
 SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX), ordered(false){
 }
-
-SpicyCustomer::~SpicyCustomer() {}
 
 std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
     if (!ordered) {
@@ -114,4 +100,44 @@ std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
 std::string SpicyCustomer::toString() const {return "";}//TODO: toString
 
 
-Customer* SpicyCustomer::clone() {return new SpicyCustomer(*this);}
+// AlchoholicCustomer class
+AlchoholicCustomer::AlchoholicCustomer(std::string name, int id) : Customer(name, id) , ordered(false),alcDishes(),minAlc(INT8_MAX),curr(INT8_MAX), alcChipInx(INT8_MAX){}
+
+
+std::vector<int>  AlchoholicCustomer::order(const std::vector<Dish> &menu) {
+    if (!ordered ) {
+        for (int i = 0; i < menu.size(); i++) {
+            if (menu[i].getType() == ALC && menu[i].getPrice() < minAlc) {
+                minAlc = menu[i].getPrice();
+                alcChipInx = i;
+            }
+        }
+        ordered = true;
+        if (alcChipInx < INT8_MAX )
+            return std::vector<int>(alcChipInx);
+        else return std::vector<int>();
+    }
+    else {
+
+
+        for (int i = 0; i < menu.size(); i++) {
+            if (menu[i].getType() == ALC && menu[i].getPrice() > minAlc && menu[i].getPrice() <= curr ) {
+                curr = menu[i].getPrice();
+                alcChipInx = i;
+            }
+        }
+        minAlc = curr;
+        curr = INT8_MAX;
+       if(alcChipInx < INT8_MAX)
+           return std::vector<int>(alcChipInx);
+       else return std::vector<int>();
+
+
+    }
+
+
+}
+
+
+
+std::string AlchoholicCustomer::toString() const {return "";}//TODO: tostring

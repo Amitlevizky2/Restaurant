@@ -77,6 +77,11 @@ public:
     Customer* clone();
 private:
 
+    int curr;
+    int minAlc;
+    int alcChipInx;
+    bool ordered;
+    std::vector<int> alcDishes;
 };
 
 
