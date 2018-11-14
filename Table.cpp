@@ -19,8 +19,10 @@ void Table::removeCustomer(int id) {
             customersList.erase(customersList.begin() + i);
         }
         for (int j = 0; j < orderList.size(); ++j) {
-            if(orderList[i].first == id)
+            if(orderList[i].first == id) {
+                totalBill = totalBill - orderList[i].second.getPrice();
                 orderList.erase(orderList.begin() + i);
+            }
         }
     }
 }

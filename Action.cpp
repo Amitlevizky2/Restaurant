@@ -4,6 +4,7 @@
 
 #include "Action.h"
 #include "Table.h"
+#include "Restaurant.h"
 
 //Start of BaseAction Abstract class
 BaseAction::BaseAction():status(PENDING), errorMsg("") {
@@ -75,6 +76,10 @@ void OpenTable::act(Restaurant &restaurant) {
 
 std::string OpenTable::toString() const {}
 
+BaseAction *OpenTable::clone() {
+    return (new OpenTable(*this));
+}
+
 
 
 //End of OpenTable class
@@ -97,7 +102,15 @@ void Order::act(Restaurant &restaurant) {
     }
 }
 
+
+
+
 std::string Order::toString() const {}
+
+BaseAction *Order::clone() {
+    return (new Order(*this));
+}
+
 //End Order class
 
 
@@ -128,6 +141,10 @@ void MoveCustomer::act(Restaurant &restaurant) {
 
 std::string MoveCustomer::toString() const {}//TODO:toString Method
 
+BaseAction *MoveCustomer::clone() {
+    return (new MoveCustomer(*this));
+}
+
 
 //Get the orders of the customer from the source table
 std::vector <int> MoveCustomer::getCustomerOrderList(int custId, int tableId, Restaurant &restaurant) {
@@ -150,7 +167,7 @@ std::vector <int> MoveCustomer::getCustomerOrderList(int custId, int tableId, Re
 Close::Close(int id) : tableId(id), BaseAction() {}
 
 void Close::act(Restaurant &restaurant) {
-    Table* table = restaurant.getTable(id);
+    Table* table = restaurant.getTable(tableId);
     if(table == nullptr || !table->isOpen()) {
         error("Table does not exist or is not open");
     }
@@ -161,7 +178,11 @@ void Close::act(Restaurant &restaurant) {
     }
 }
 
-std::string Close::toString() const {}
+std::string Close::toString() const {}//TODO:toString()
+
+BaseAction *Close::clone() {
+    return (new Close(*this));
+}
 //End of Close class
 
 
@@ -175,13 +196,17 @@ void CloseAll::act(Restaurant &restaurant)
         Table* table = restaurant.getTable(i);
         if(table != nullptr) {
             std::cout << "Table " << i << " was closed. Bill " << table->getBill() << "NIS";
-            table.closeTable();
+            table->closeTable();
         }
     }
     complete();
 }
 
 std::string CloseAll::toString() const {}//TODO:toString()
+
+BaseAction *CloseAll::clone() {
+    return (new CloseAll(*this));
+}
 //End of CloseAll class
 
 
@@ -199,6 +224,10 @@ void PrintMenu::act(Restaurant &restaurant)
 }
 
 std::string PrintMenu::toString() const {}//TODO:toString()
+
+BaseAction *PrintMenu::clone() {
+    return (new PrintMenu(*this));
+}
 //End of PrintMenu class
 
 
@@ -208,6 +237,11 @@ PrintTableStatus::PrintTableStatus(int id) : tableId(id), BaseAction() {}
 void PrintTableStatus::act(Restaurant &restaurant) {}
 
 std::string PrintTableStatus::toString() const {}
+
+BaseAction *PrintTableStatus::clone() {
+    return (new PrintTableStatus(*this));
+}
+
 //End of PrintTableStatus class
 
 
@@ -217,6 +251,10 @@ PrintActionsLog::PrintActionsLog() : BaseAction() {}
 void PrintActionsLog::act(Restaurant &restaurant) {}
 
 std::string PrintActionsLog::toString() const {}
+
+BaseAction *PrintActionsLog::clone() {
+    return (new PrintActionsLog(*this));
+}
 //End of PrintMenu class
 
 
@@ -226,6 +264,10 @@ BackupRestaurant::BackupRestaurant() : BaseAction() {}
 void BackupRestaurant::act(Restaurant &restaurant) {}
 
 std::string BackupRestaurant::toString() const {}
+
+BaseAction *BackupRestaurant::clone() {
+    return (new BackupRestaurant(*this));
+}
 //End of BackupRestaurant class
 
 
@@ -235,6 +277,10 @@ RestoreResturant::RestoreResturant() : BaseAction() {}
 void RestoreResturant::act(Restaurant &restaurant) {}
 
 std::string RestoreResturant::toString() const {}
+
+BaseAction *RestoreResturant::clone() {
+    return (new RestoreResturant(*this));
+}
 //End of RestoreResturant class
 
 

@@ -42,7 +42,7 @@ private:
 class CheapCustomer : public Customer {
 public:
     CheapCustomer(std::string name, int id);
-    ~CheapCustomer();
+    virtual ~CheapCustomer();
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
     Customer* clone();
