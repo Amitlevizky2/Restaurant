@@ -19,9 +19,11 @@ class Restaurant;
 class BaseAction{
 public:
     BaseAction();
+    BaseAction(const BaseAction& other);
     ActionStatus getStatus() const;
     virtual void act(Restaurant& restaurant)=0;
     virtual std::string toString() const=0;
+    virtual BaseAction* clone() = 0;
 protected:
     void complete();
     void error(std::string errorMsg);
@@ -35,17 +37,22 @@ private:
 class OpenTable : public BaseAction {
 public:
     OpenTable(int id, std::vector<Customer *> &customersList);
-    void act(Restaurant &restaurant);
-    std::string toString() const;
+    OpenTable(const OpenTable& other);
+    ~OpenTable();
+    OpenTable(OpenTable&& other);
+    BaseAction *clone() override;
+    void act(Restaurant &restaurant) override;
+    std::string toString() const override;
 private:
     const int tableId;
-    const std::vector<Customer *> customers;
+    std::vector<Customer *> customers;
 };
 
 
 class Order : public BaseAction {
 public:
     Order(int id);
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
@@ -57,8 +64,10 @@ class MoveCustomer : public BaseAction {
 public:
     MoveCustomer(int src, int dst, int customerId);
     void act(Restaurant &restaurant);
+    BaseAction *clone() override;
     std::string toString() const;
 private:
+    std::vector <int> getCustomerOrderList(int custId, int tableId, Restaurant &restaurant);
     const int srcTable;
     const int dstTable;
     const int id;
@@ -68,6 +77,7 @@ private:
 class Close : public BaseAction {
 public:
     Close(int id);
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
@@ -78,6 +88,7 @@ private:
 class CloseAll : public BaseAction {
 public:
     CloseAll();
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
@@ -87,15 +98,18 @@ private:
 class PrintMenu : public BaseAction {
 public:
     PrintMenu();
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
+    std::vector<Dish> menu;
 };
 
 
 class PrintTableStatus : public BaseAction {
 public:
     PrintTableStatus(int id);
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
@@ -106,6 +120,7 @@ private:
 class PrintActionsLog : public BaseAction {
 public:
     PrintActionsLog();
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
@@ -115,6 +130,7 @@ private:
 class BackupRestaurant : public BaseAction {
 public:
     BackupRestaurant();
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
@@ -124,6 +140,7 @@ private:
 class RestoreResturant : public BaseAction {
 public:
     RestoreResturant();
+    BaseAction *clone() override;
     void act(Restaurant &restaurant);
     std::string toString() const;
 
