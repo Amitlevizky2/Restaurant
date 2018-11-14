@@ -12,7 +12,7 @@
 class Customer{
 public:
     Customer(std::string c_name, int c_id);
-    virtual  ~Customer();
+    virtual  ~Customer() = default;
     virtual std::vector<int> order(const std::vector<Dish> &menu)=0;
     virtual std::string toString() const = 0;
     std::string getName() const;
@@ -28,7 +28,7 @@ private:
 class VegetarianCustomer : public Customer {
 public:
     VegetarianCustomer(std::string name, int id);
-    ~VegetarianCustomer();
+    ~VegetarianCustomer() = default;
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
     Customer* clone();
@@ -42,7 +42,7 @@ private:
 class CheapCustomer : public Customer {
 public:
     CheapCustomer(std::string name, int id);
-    virtual ~CheapCustomer();
+    virtual ~CheapCustomer() = default;
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
     Customer* clone();
@@ -55,7 +55,7 @@ private:
 class SpicyCustomer : public Customer {
 public:
     SpicyCustomer(std::string name, int id);
-    ~SpicyCustomer();
+    ~SpicyCustomer() = default;
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
     Customer* clone();
@@ -71,7 +71,7 @@ private:
 class AlchoholicCustomer : public Customer {
 public:
     AlchoholicCustomer(std::string name, int id);
-    ~AlchoholicCustomer();
+    ~AlchoholicCustomer() = default;
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
     Customer* clone();
