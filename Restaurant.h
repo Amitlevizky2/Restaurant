@@ -32,5 +32,6 @@ private:
     std::vector<Table*> tables;
     std::vector<Dish> menu;
     std::vector<BaseAction*> actionsLog;
+    DishType findMyType(std::string strType);
 };
 #endif //RESTAURANT_H_

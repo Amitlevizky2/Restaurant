@@ -8,8 +8,51 @@
 
 Restaurant::Restaurant() : open(true) {}
 
-Restaurant::Restaurant(const std::string &configFilePath) :  open(true){
+Restaurant::Restaurant(const std::string &configFilePath) :  open(true)
+{
     std::ifstream myfile(configFilePath);
+    std::string line;
+    std::string delimeter = ",";
+    int numOfTables = INT8_MAX;
+
+    if(myfile.is_open())
+    {
+        while (getline(myfile, line))
+        {
+            line = line + ",";
+            size_t pos = 0;
+            std::string token;
+            std::vector<std::string> newDish;
+            while ((pos = line.find(delimeter)) != std::string::npos && line[0] != '#')
+            {
+                token = line.substr(0, pos);
+                if(numOfTables == INT8_MAX)
+                {
+                    numOfTables = std::stoi(token);
+                    line.erase(0, pos + delimeter.length());
+                }
+                else if(tables.size() < numOfTables)
+                {
+                    Table *t = new Table(std::stoi(token));
+                    tables.push_back(t);
+                    line.erase(0, pos + delimeter.length());
+                }
+                else
+                {
+
+                    newDish.push_back(token);
+                    line.erase(0, pos + delimeter.length());
+                }
+                if(newDish.size() == 3)
+                {
+                    DishType menuDish = findMyType(newDish[1]);
+                    Dish toBeAdd(menu.size(), newDish[0], std::stoi(newDish[2]), menuDish);
+                    menu.push_back(toBeAdd);
+                    newDish.clear();
+                }
+            }
+        }
+    }
 }
 
 Restaurant::Restaurant(const Restaurant &other) :open(true), menu(other.menu)
@@ -91,7 +134,10 @@ Restaurant &Restaurant::operator=(Restaurant &&other) {
     return *this;
 }
 
-void Restaurant::start(){}
+void Restaurant::start()
+{
+
+}
 
 int Restaurant::getNumOfTables() const {
     return tables.size();
@@ -106,3 +152,15 @@ Table* Restaurant::getTable(int ind) {
 std::vector<Dish>& Restaurant::getMenu() {return menu; }
 
 const std::vector<BaseAction*>& Restaurant::getActionsLog() const { return actionsLog;}
+
+DishType Restaurant::findMyType(std::string strType)
+{
+    if(strType == "ALC")
+        return ALC;
+    if(strType == "VEG")
+        return VEG;
+    if(strType == "SPC")
+        return SPC;
+    if(strType == "BVG")
+        return BVG;
+}

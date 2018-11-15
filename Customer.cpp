@@ -136,6 +136,8 @@ std::vector<int>  AlchoholicCustomer::order(const std::vector<Dish> &menu) {
 
         for (int i = 0; i < menu.size(); i++) {
             if (menu[i].getType() == ALC && menu[i].getPrice() > minAlc && menu[i].getPrice() <= curr ) {
+
+
                 curr = menu[i].getPrice();
                 alcChipInx = i;
             }

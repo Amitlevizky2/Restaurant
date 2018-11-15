@@ -7,6 +7,64 @@
 
 Table::Table(int t_capacity) : capacity(t_capacity), open(false), customersList(), orderList(), totalBill(0) {}
 
+Table::Table(const Table &other) :  capacity(other.capacity), open(false), customersList(), orderList(other.orderList), totalBill(0)
+{
+    for (int i = 0; i < other.customersList.size(); ++i)
+    {
+        customersList.push_back(other.customersList.at(i)->clone());
+    }
+
+}
+
+Table::~Table()
+{
+    for (int i = 0; i < customersList.size(); ++i)
+    {
+        delete customersList.at(i);
+    }
+}
+
+Table &Table::operator=(const Table &other) {
+            if(this == &other)
+                return *this;
+            capacity = other.capacity;
+            open = other.open;
+            for (int i = 0; i < customersList.size(); ++i)
+            {
+                delete customersList.at(i);
+            }
+            customersList.clear();
+            for (int j = 0; j < other.customersList.size(); ++j)
+            {
+                customersList.push_back(other.customersList.at(j)->clone());
+            }
+            orderList = std::move(orderList);
+
+        }
+
+Table::Table(Table &&other) : capacity(other.capacity), open(other.open), totalBill(other.totalBill), customersList(std::move(other.customersList))
+{
+}
+
+Table &Table::operator=(Table &&other)
+        {
+            if(this == &other)
+                return *this;
+            capacity = other.capacity;
+            open = other.open;
+            totalBill = other.totalBill;
+            for (int i = 0; i < customersList.size(); ++i)
+            {
+                delete customersList.at(i);
+            }
+            customersList.clear();
+            for (int j = 0; j < other.customersList.size(); ++j)
+            {
+                customersList.push_back(other.customersList.at(j));
+            }
+            orderList = std::move(other.orderList);
+        }
+
 int Table::getCapacity() const {return capacity;}
 
 void Table::addCustomer(Customer *customer) {
