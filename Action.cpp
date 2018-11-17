@@ -5,7 +5,7 @@
 #include "Action.h"
 #include "Table.h"
 #include "Restaurant.h"
-
+extern Restaurant* backup;
 //Start of BaseAction Abstract class
 BaseAction::BaseAction():status(PENDING), errorMsg("") {
     status = PENDING;
@@ -19,8 +19,8 @@ void BaseAction::complete() {status = COMPLETED; }
 
 void BaseAction::error(std::string errorMsg) {
     status = ERROR;
-    this->errorMsg = errorMsg;
-    std::cout << "Error: " << errorMsg << std::endl;
+    this->errorMsg = " " + errorMsg;
+    std::cout << " " << errorMsg << std::endl;
 
 }
 
@@ -43,15 +43,7 @@ OpenTable::OpenTable(const OpenTable& other) : BaseAction(other), tableId(other.
     }
 }
 
-//destructor
-OpenTable::~OpenTable()
-{
-    for (int i = 0; i < customers.size(); ++i)
-    {
-        delete customers[i];
-        customers[i] = nullptr;
-    }
-}
+
 
 //Move constructor
 OpenTable::OpenTable(OpenTable&& other) : BaseAction(), tableId(other.tableId), customers(std::move(other.customers))
@@ -62,7 +54,7 @@ void OpenTable::act(Restaurant &restaurant) {
     Table* temp = restaurant.getTable(tableId);
     if(temp == nullptr || temp->isOpen())
     {
-        error("Table does not exist or is already open");
+        error("open " + restaurant.logOpenTableMsg() + " Error: Table does not exist or is already open");
     }
     else
     {
@@ -71,13 +63,14 @@ void OpenTable::act(Restaurant &restaurant) {
         complete();
     }
 
-    completeMessage = "open " + std::to_string(tableId) + " " ;
-    for (int i=0;i<customers.size();++i)
-    {
-        completeMessage.append(customers[i]->toString());
-    }
     if(getStatus() == ActionStatus::COMPLETED)
     {
+
+        completeMessage = "open " + std::to_string(tableId) + " " ;
+        for (int i=0;i<customers.size();++i)
+        {
+            completeMessage.append(customers[i]->toString());
+        }
         completeMessage.append("Completed");
     }
     else  if(getStatus() == ActionStatus::ERROR)
@@ -87,6 +80,7 @@ void OpenTable::act(Restaurant &restaurant) {
     else completeMessage.append("Pending");
 
 }
+
 
 
 
@@ -101,6 +95,7 @@ BaseAction *OpenTable::clone() {
 
 
 
+
 //End of OpenTable class
 
 
@@ -112,7 +107,7 @@ void Order::act(Restaurant &restaurant) {
     Table* currentTable = restaurant.getTable(tableId);
     if(currentTable == nullptr || !(currentTable->isOpen()))
     {
-        error("Table does not exist or is not open");
+        error("Error: Table does not exist or is not open");
     }
     else
     {
@@ -126,7 +121,7 @@ void Order::act(Restaurant &restaurant) {
 
 std::string Order::toString() const
 {
-    std::string msg("order" + std::to_string(tableId) + " ");
+    std::string msg("order " + std::to_string(tableId) + " ");
     if(getStatus() == ActionStatus::COMPLETED)
     {
         msg.append("Completed");
@@ -165,19 +160,16 @@ void MoveCustomer::act(Restaurant &restaurant) {
         }
         destination->getCustomers().push_back(source->getCustomer(id));//Move the customer to the destination table
         source->removeCustomer(id);//Remove the customer from the source table
-        std::cout << "move " << srcTable << " " << dstTable << " " << id;
         if(source->getCustomers().empty())
             source->closeTable();
         complete();
     }
-    std::cout << source->getBill() << " \n";
-    std::cout << destination->getBill() << " \n";
 
 }
 
 std::string MoveCustomer::toString() const
 {
-    std::string msg("move" + std::to_string(srcTable) +" " + std::to_string(dstTable) + " " + std::to_string(id));
+    std::string msg("move " + std::to_string(srcTable) +" " + std::to_string(dstTable) + " " + std::to_string(id) + " ");
     if(getStatus() == ActionStatus::COMPLETED)
     {
         msg.append("Completed");
@@ -224,12 +216,13 @@ void Close::act(Restaurant &restaurant) {
     else {
         std::cout << "Table " << tableId << " was closed. Bill " << table->getBill() << "NIS\n";
         table->closeTable();
+        complete();
     }
 }
 
 std::string Close::toString() const
 {
-    std::string msg("close" + std::to_string(tableId) + " ");
+    std::string msg("close " + std::to_string(tableId) + " ");
     if(getStatus() == ActionStatus::COMPLETED)
     {
         msg.append("Completed");
@@ -298,7 +291,7 @@ void PrintMenu::act(Restaurant &restaurant)
 
 std::string PrintMenu::toString() const
 {
-    std::string msg("menu");
+    std::string msg("menu ");
     if(getStatus() == ActionStatus::COMPLETED)
     {
         msg.append("Completed");
@@ -358,7 +351,7 @@ void PrintTableStatus::act(Restaurant &restaurant)
 
 std::string PrintTableStatus::toString() const
 {
-    std::string msg("status" + std::to_string(tableId) + " ");
+    std::string msg("status " + std::to_string(tableId) + " ");
     if(getStatus() == ActionStatus::COMPLETED)
     {
         msg.append("Completed");
@@ -414,7 +407,18 @@ BaseAction *PrintActionsLog::clone() {
 //BackupResturant class
 BackupRestaurant::BackupRestaurant() : BaseAction() {}
 
-void BackupRestaurant::act(Restaurant &restaurant) {}
+void BackupRestaurant::act(Restaurant &restaurant)
+{
+    if(backup!= nullptr)
+    {
+        delete backup;
+        backup= nullptr;
+        *backup = restaurant;
+    }
+    else
+        backup= new Restaurant(restaurant);
+    complete();
+}
 
 std::string BackupRestaurant::toString() const
 {
@@ -440,11 +444,22 @@ BaseAction *BackupRestaurant::clone() {
 //RestoreResturant class
 RestoreResturant::RestoreResturant() : BaseAction() {}
 
-void RestoreResturant::act(Restaurant &restaurant) {}
+void RestoreResturant::act(Restaurant &restaurant)
+{
+    if(backup != nullptr)
+    {
+        restaurant = *backup;
+        complete();
+    }
+    else
+    {
+        error("No Backup available");
+    }
+}
 
 std::string RestoreResturant::toString() const
 {
-    std::string msg("restore");
+    std::string msg("restore ");
     if(getStatus() == ActionStatus::COMPLETED)
     {
         msg.append("Completed");

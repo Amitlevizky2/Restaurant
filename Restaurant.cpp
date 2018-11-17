@@ -61,12 +61,12 @@ Restaurant::Restaurant(const Restaurant &other) :open(other.open), nextCustomerI
 {
     for (int i = 0; i < other.tables.size(); ++i)
     {
-        Table* tempTable = new Table(other.tables[i]->getCapacity());
+        Table* tempTable = new Table(*other.tables[i]);
         tables.push_back(tempTable);
     }
     for (int j = 0; j < other.actionsLog.size(); ++j)
     {
-        BaseAction* tempBaseAction = other.actionsLog[j]->clone();
+        BaseAction* tempBaseAction = new;
         actionsLog.push_back(tempBaseAction);
     }
 }
@@ -85,6 +85,8 @@ Restaurant::~Restaurant()
 
 Restaurant::Restaurant(Restaurant &&other) : open(other.open), nextCustomerId(other.nextCustomerId), tables(std::move(other.tables)), actionsLog(std::move(other.actionsLog)), menu(std::move(other.menu))
 {
+    other.tables.clear();
+    other.actionsLog.clear();
 }//TODO::to be complete
 
 Restaurant &Restaurant::operator=(const Restaurant &other) {
@@ -100,7 +102,8 @@ Restaurant &Restaurant::operator=(const Restaurant &other) {
 
     for (int j = 0; j < other.tables.size(); ++j)
     {
-        tables.push_back(other.tables[j]);
+        Table* newTable = new Table(*other.tables.at(j));
+        tables.push_back(newTable);
     }
 
     for (int k = 0; k < other.actionsLog.size(); ++k)
@@ -111,7 +114,7 @@ Restaurant &Restaurant::operator=(const Restaurant &other) {
 
     for (int l = 0; l < other.actionsLog.size(); ++l)
     {
-        actionsLog.push_back(other.actionsLog[l]);
+        actionsLog.push_back(other.actionsLog[l]->clone());
     }
 }
 
@@ -175,6 +178,10 @@ void Restaurant::start()
             goLog();
         else if (token == "backup")
             goBackup();
+        else if (token == "restore")
+            goRestore();
+        else
+            std::cout << "Wrong input, try again \n";
     }
 }
 
@@ -206,6 +213,7 @@ DishType Restaurant::findMyType(std::string strType)
 
 void Restaurant::goOpen(std::string details)//TODO:Delete the customers if the table is not exist
 {
+    newMsg = details;
     std::vector<Customer*> customers;
     int tableId;
     std::string delimiterSpace = " ";
@@ -221,7 +229,7 @@ void Restaurant::goOpen(std::string details)//TODO:Delete the customers if the t
     //get the customers
     pos1 = 0;
     size_t pos2 = 0;
-    while((pos2 = details.find(delimiterSpace)) != std::string::npos && tables.at(tableId) != nullptr)
+    while((pos2 = details.find(delimiterSpace)) != std::string::npos && getTable(tableId) != nullptr)
     {
         pos2 = details.find(delimiterComa);
         token1 = details.substr(0, pos2);
@@ -231,7 +239,7 @@ void Restaurant::goOpen(std::string details)//TODO:Delete the customers if the t
         token2 = details.substr(0, pos2);
         details.erase(0, pos2 + delimiterSpace.length());
 
-        if(!token1.empty() && !token2.empty() && tables.at(tableId))
+        if(!token1.empty() && !token2.empty() && !tables.at(tableId)->isOpen())
         {
             Customer *newCustomer = createCustomerByType(token1, token2);
             customers.push_back(newCustomer);
@@ -310,6 +318,7 @@ void Restaurant::goCloseAll()
 {
     CloseAll* newCloseAll = new CloseAll();
     newCloseAll->act(*this);
+    actionsLog.push_back(newCloseAll);
 }
 
 void Restaurant::goMenu()
@@ -349,7 +358,7 @@ void Restaurant::goBackup()
 }
 
 
-void Restaurant::goRestor()
+void Restaurant::goRestore()
 {
     RestoreResturant* newRestore = new RestoreResturant();
     newRestore->act(*this);
@@ -366,4 +375,9 @@ Customer* Restaurant::createCustomerByType(std::string name, std::string strateg
         return new CheapCustomer(name, nextCustomerId);
     if (strategy == "alc")
         return new AlchoholicCustomer(name, nextCustomerId);
+}
+
+std::string Restaurant::logOpenTableMsg()
+{
+    return newMsg;
 }

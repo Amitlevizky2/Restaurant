@@ -26,6 +26,7 @@ public:
     Table* getTable(int ind);
     const std::vector<BaseAction*>& getActionsLog() const; // Return a reference to the history of actions
     std::vector<Dish>& getMenu();
+    std::string logOpenTableMsg();
 
 private:
     bool open;
@@ -43,8 +44,9 @@ private:
     void goStatus(std::string details);
     void goLog();
     void goBackup();
-    void goRestor();
+    void goRestore();
     Customer* createCustomerByType(std::string name, std::string strategy);
+    std::string newMsg;
 
 
 

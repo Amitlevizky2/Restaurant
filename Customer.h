@@ -77,13 +77,13 @@ public:
     std::string toString() const;
     Customer* clone();
 private:
-    int maxDrink;
+    int maxAlc;
     int maxInx;
     int curr;
     int minAlc;
-    int alcChipInx;
+    int minInx;
     bool ordered;
-    std::vector<int> alcDishes;
+
 };
 
 

@@ -127,60 +127,66 @@ Customer *SpicyCustomer::clone() {
 
 
 // AlchoholicCustomer class
-AlchoholicCustomer::AlchoholicCustomer(std::string name, int id) : Customer(name, id) , ordered(false),alcDishes(),minAlc(INT8_MAX), maxDrink(0), maxInx(0) , alcChipInx(INT8_MAX){}
+AlchoholicCustomer::AlchoholicCustomer(std::string name, int id) : Customer(name, id) , ordered(false),minAlc(INT8_MAX), maxAlc(0), maxInx(0) , minInx(INT8_MAX){}
 
-
-std::vector<int>  AlchoholicCustomer::order(const std::vector<Dish> &menu) {
+std::vector<int>  AlchoholicCustomer::order(const std::vector<Dish> &menu)
+{
+    int lastChecked = INT8_MAX;
+    int lastCheckedIndex = INT8_MAX;
     std::vector<int> newOrder;
-    int curr =INT8_MAX;
-    if (!ordered ) {
-        for (int i = 0; i < menu.size(); i++) {
-            if (menu[i].getType() == ALC && menu[i].getPrice() < minAlc) {
-                minAlc = menu[i].getPrice();
-                alcChipInx = i;
-                if(menu[i].getPrice()>= maxDrink) {
-                    maxDrink = menu[i].getPrice();
-                    maxInx = menu[i].getId();
-                }
-            }
-        }
-        ordered = true;
-        if (alcChipInx < INT8_MAX )
-            return std::vector<int>(alcChipInx);
-        else return std::vector<int>();
-    }
-    else {
-
-
-        for (int i = 0; i < menu.size(); i++) {
-
-            if (menu[i].getType() == ALC && menu[i].getPrice() >= minAlc && menu[i].getPrice() <= curr )
-            {
-                if(menu[i].getId() > alcChipInx && menu[i].getPrice() == curr)
-                {
-                    newOrder.push_back(alcChipInx);
-                    return newOrder;
-                }
-                curr = menu[i].getPrice();
-                alcChipInx = i;
-                if(menu[i].getId() == maxInx)
-                    break;
-            }
-        }
-        minAlc = curr;
-
-        if(alcChipInx < INT8_MAX)
+    if(minInx == maxInx)
+        return newOrder;
+    if(!ordered)
+    {
+        for (int i = 0; i < menu.size(); ++i)
         {
-            newOrder.push_back(alcChipInx);
+            if (menu.at(i).getType() == ALC && menu.at(i).getPrice() < minAlc)
+            {
+                minAlc = menu.at(i).getPrice();
+                minInx = i;
+            }
+
+            if(menu.at(i).getType() == ALC && menu.at(i).getPrice() >= maxAlc)
+            {
+                maxAlc = menu.at(i).getPrice();
+                maxInx = i;
+            }
+        }
+
+        if(minAlc < INT8_MAX)
+        {
+            newOrder.push_back(minInx);
+            ordered = true;
             return newOrder;
         }
-        else return std::vector<int>();
-
-
+        ordered = true;
+        return newOrder;
     }
-
-
-
+    bool changed = false;
+    for (int i = 0; i < menu.size(); ++i)
+    {
+        if(menu.at(i).getPrice() >= minAlc && menu.at(i).getType() == ALC)
+        {
+            if(menu.at(i).getPrice() == minAlc && minInx < i)// && !changed
+            {
+                minInx = i;
+                minAlc = menu.at(i).getPrice();
+                newOrder.push_back(minInx);
+                return newOrder;
+            }
+            else if(menu.at(i).getPrice() > minAlc && menu.at(i).getPrice() < lastChecked)
+            {
+                lastChecked = menu.at(i).getPrice();
+                lastCheckedIndex = i;
+                changed=true;
+            }
+        }
+    }
+    minInx = lastCheckedIndex;
+    minAlc = lastChecked;
+    if(minInx != INT8_MAX)
+        newOrder.push_back(minInx);
+    return newOrder;
 }
 
 

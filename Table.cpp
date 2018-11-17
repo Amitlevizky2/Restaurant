@@ -7,13 +7,12 @@
 
 Table::Table(int t_capacity) : capacity(t_capacity), open(false), customersList(), orderList() {}
 
-Table::Table(const Table &other) :  capacity(other.capacity), open(false), customersList(), orderList(other.orderList)
+Table::Table(const Table &other) :  capacity(other.capacity), open(other.open), customersList(), orderList(other.orderList)
 {
     for (int i = 0; i < other.customersList.size(); ++i)
     {
         customersList.push_back(other.customersList.at(i)->clone());
     }
-
 }
 
 Table::~Table()
@@ -104,6 +103,7 @@ void Table::order(const std::vector<Dish> &menu) {
         for (int j = 0; j < ordrByCtr.size(); ++j) {
             OrderPair newOrdByCtr(currentCustomer->getId(), menu.at(ordrByCtr.at(j)));
             orderList.push_back(newOrdByCtr);
+            std::cout << currentCustomer->getName() << " ordered " << menu.at(ordrByCtr.at(j)).getName() << "\n";
         }
     }
 }
