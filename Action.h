@@ -46,6 +46,7 @@ public:
 private:
     const int tableId;
     std::vector<Customer *> customers;
+    std::string completeMessage;
 };
 
 
@@ -103,6 +104,7 @@ public:
     std::string toString() const;
 private:
     std::vector<Dish> menu;
+    std::string findMyType(DishType type);
 };
 
 

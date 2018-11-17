@@ -5,9 +5,9 @@
 #include "Table.h"
 #include <iostream>
 
-Table::Table(int t_capacity) : capacity(t_capacity), open(false), customersList(), orderList(), totalBill(0) {}
+Table::Table(int t_capacity) : capacity(t_capacity), open(false), customersList(), orderList() {}
 
-Table::Table(const Table &other) :  capacity(other.capacity), open(false), customersList(), orderList(other.orderList), totalBill(0)
+Table::Table(const Table &other) :  capacity(other.capacity), open(false), customersList(), orderList(other.orderList)
 {
     for (int i = 0; i < other.customersList.size(); ++i)
     {
@@ -22,6 +22,7 @@ Table::~Table()
     {
         delete customersList.at(i);
     }
+    customersList.clear();
 }
 
 Table &Table::operator=(const Table &other) {
@@ -42,17 +43,15 @@ Table &Table::operator=(const Table &other) {
 
         }
 
-Table::Table(Table &&other) : capacity(other.capacity), open(other.open), totalBill(other.totalBill), customersList(std::move(other.customersList))
+Table::Table(Table &&other) : capacity(other.capacity), open(other.open), customersList(std::move(other.customersList))
 {
 }
-
 Table &Table::operator=(Table &&other)
         {
             if(this == &other)
                 return *this;
             capacity = other.capacity;
             open = other.open;
-            totalBill = other.totalBill;
             for (int i = 0; i < customersList.size(); ++i)
             {
                 delete customersList.at(i);
@@ -64,11 +63,10 @@ Table &Table::operator=(Table &&other)
             }
             orderList = std::move(other.orderList);
         }
-
 int Table::getCapacity() const {return capacity;}
 
 void Table::addCustomer(Customer *customer) {
-    customersList.push_back(customer);//Add Condition
+    customersList.push_back(customer);
 }
 
 void Table::removeCustomer(int id) {
@@ -79,7 +77,7 @@ void Table::removeCustomer(int id) {
 
         std::vector<OrderPair> newPairOrderList;
         for (int j = 0; j < orderList.size(); ++j) {
-            if (!newPairOrderList.at(j).first != id){
+            if (orderList.at(j).first != id){
                 newPairOrderList.push_back(orderList.at(j));
             }
         }
@@ -106,7 +104,6 @@ void Table::order(const std::vector<Dish> &menu) {
         for (int j = 0; j < ordrByCtr.size(); ++j) {
             OrderPair newOrdByCtr(currentCustomer->getId(), menu.at(ordrByCtr.at(j)));
             orderList.push_back(newOrdByCtr);
-            totalBill = totalBill + menu[ordrByCtr[j]].getPrice();
         }
     }
 }
@@ -120,11 +117,18 @@ void Table::closeTable() {
         delete customersList[i];
     }
     customersList.clear();
-    //orderList.clear();
+    orderList.clear();
     open=false;
-    totalBill = 0;
 }
 
-int Table::getBill() { return totalBill;}
+int Table::getBill()
+{
+    int totalBill=0;
+    for (int i = 0; i < orderList.size(); ++i)
+    {
+        totalBill = totalBill + orderList.at(i).second.getPrice();
+    }
+    return totalBill;
+}
 
 bool Table::isOpen() { return open;}

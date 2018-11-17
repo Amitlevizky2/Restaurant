@@ -29,9 +29,24 @@ public:
 
 private:
     bool open;
+    int nextCustomerId;
     std::vector<Table*> tables;
     std::vector<Dish> menu;
     std::vector<BaseAction*> actionsLog;
     DishType findMyType(std::string strType);
+    void goOpen(std::string details);
+    void goOrder(std::string details);
+    void goMove(std::string details);
+    void goClose(std::string details);
+    void goCloseAll();
+    void goMenu();
+    void goStatus(std::string details);
+    void goLog();
+    void goBackup();
+    void goRestor();
+    Customer* createCustomerByType(std::string name, std::string strategy);
+
+
+
 };
 #endif //RESTAURANT_H_
