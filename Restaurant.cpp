@@ -6,9 +6,9 @@
 #include <iostream>
 #include <fstream>
 
-Restaurant::Restaurant() : open(true), nextCustomerId(0) {}
+Restaurant::Restaurant() : open(true), nextCustomerId(0), tables(), menu(), actionsLog(), newMsg(""){}
 
-Restaurant::Restaurant(const std::string &configFilePath) :  open(true), nextCustomerId(0)
+Restaurant::Restaurant(const std::string &configFilePath) : open(true), nextCustomerId(0), tables(), menu(), actionsLog(), newMsg("")
 {
     std::ifstream myfile(configFilePath);
     std::string line;
@@ -19,21 +19,23 @@ Restaurant::Restaurant(const std::string &configFilePath) :  open(true), nextCus
     {
         while (getline(myfile, line))
         {
-            line = line + ",";
+            line  += ",";
             size_t pos = 0;
             std::string token;
             std::vector<std::string> newDish;
             while ((pos = line.find(delimeter)) != std::string::npos && line[0] != '#')
             {
+                int tablesSize = tables.size();
+
                 token = line.substr(0, pos);
                 if(numOfTables == INT8_MAX)
                 {
                     numOfTables = std::stoi(token);
                     line.erase(0, pos + delimeter.length());
                 }
-                else if(tables.size() < numOfTables)
+                else if(tablesSize < numOfTables)
                 {
-                    Table *t = new Table(std::stoi(token));
+                    auto *t = new Table(std::stoi(token));
                     tables.push_back(t);
                     line.erase(0, pos + delimeter.length());
                 }
@@ -46,7 +48,7 @@ Restaurant::Restaurant(const std::string &configFilePath) :  open(true), nextCus
                 if(newDish.size() == 3)
                 {
                     DishType menuDish = findMyType(newDish[1]);
-                    Dish toBeAdd(menu.size(), newDish[0], std::stoi(newDish[2]), menuDish);
+                    Dish toBeAdd(static_cast<int>(menu.size()), newDish[0], std::stoi(newDish[2]), menuDish);
                     menu.push_back(toBeAdd);
                     newDish.clear();
                 }
@@ -57,35 +59,31 @@ Restaurant::Restaurant(const std::string &configFilePath) :  open(true), nextCus
 
 
 
-Restaurant::Restaurant(const Restaurant &other) :open(other.open), nextCustomerId(other.nextCustomerId), menu(other.menu)
+Restaurant::Restaurant(const Restaurant &other) :open(other.open), nextCustomerId(other.nextCustomerId),  tables(), menu(other.menu), actionsLog(), newMsg("")
 {
-    for (int i = 0; i < other.tables.size(); ++i)
-    {
-        Table* tempTable = new Table(*other.tables[i]);
+    for (auto table : other.tables) {
+        auto * tempTable = new Table(*table);
         tables.push_back(tempTable);
     }
-    for (int j = 0; j < other.actionsLog.size(); ++j)
-    {
-        actionsLog.push_back(other.actionsLog.at(j)->clone());
+    for (auto j : other.actionsLog) {
+        actionsLog.push_back(j->clone());
     }
 }
 
 Restaurant::~Restaurant()
 {
-    for (int i = 0; i < tables.size(); ++i)
-    {
-        delete tables[i];
+    for (auto &table : tables) {
+        delete table;
     }
-    for (int j = 0; j < actionsLog.size(); ++j)
-    {
-        delete(actionsLog[j]);
+    for (auto &j : actionsLog) {
+        delete j;
     }
     tables.clear();
     actionsLog.clear();
     menu.clear();
 }
 
-Restaurant::Restaurant(Restaurant &&other) : open(other.open), nextCustomerId(other.nextCustomerId), tables(std::move(other.tables)), actionsLog(std::move(other.actionsLog)), menu(std::move(other.menu))
+Restaurant::Restaurant(Restaurant &&other) : open(other.open), nextCustomerId(other.nextCustomerId), tables(std::move(other.tables)), menu(std::move(other.menu)), actionsLog(std::move(other.actionsLog)), newMsg("")
 {
     other.tables.clear();
     other.actionsLog.clear();
@@ -97,35 +95,30 @@ Restaurant &Restaurant::operator=(const Restaurant &other) {
         return *this;
     open = other.open;
     nextCustomerId=other.nextCustomerId;
-
-    for (int i = 0; i < other.tables.size(); ++i)
-    {
-        delete tables[i];
+    for (auto &table : tables) {
+        delete table;
     }
     tables.clear();
 
-    for (int j = 0; j < other.tables.size(); ++j)
-    {
-        Table* newTable = new Table(*other.tables.at(j));
+    for (auto table : other.tables) {
+        auto * newTable = new Table(*table);
         tables.push_back(newTable);
     }
 
-    for (int k = 0; k < actionsLog.size(); ++k)
-    {
-        delete actionsLog[k];
+    for (auto &k : actionsLog) {
+        delete k;
     }
     actionsLog.clear();
 
-    for (int l = 0; l < other.actionsLog.size(); ++l)
-    {
-        actionsLog.push_back(other.actionsLog[l]->clone());
+    for (auto l : other.actionsLog) {
+        actionsLog.push_back(l->clone());
     }
 
     menu.clear();
-    for (int m = 0; m < other.menu.size(); ++m)
-    {
-        menu.push_back(other.menu.at(m));
+    for (const auto &m : other.menu) {
+        menu.push_back(m);
     }
+    return *this;
 }
 
 Restaurant &Restaurant::operator=(Restaurant &&other) {
@@ -135,16 +128,14 @@ Restaurant &Restaurant::operator=(Restaurant &&other) {
     nextCustomerId = other.nextCustomerId;
     //menu.clear();
     menu = std::move(other.menu);
-    for (int i = 0; i < tables.size(); ++i)
-    {
-        delete tables[i];
+    for (auto &table : tables) {
+        delete table;
     }
     tables.clear();
     tables = other.tables;
 
-    for (int j = 0; j < actionsLog.size(); ++j)
-    {
-        delete actionsLog[j];
+    for (auto &j : actionsLog) {
+        delete j;
     }
     actionsLog.clear();
     actionsLog = other.actionsLog;
@@ -164,7 +155,7 @@ void Restaurant::start()
         std::string action1;
         std::cout << "Please enter an Action you want to do: \n";
         std::getline(std::cin, action1);
-        action1 = action1 + " ";
+        action1 += " ";
         pos = action1.find(delimiter);
         token = action1.substr(0, pos);
         action1.erase(0, pos + delimiter.length());
@@ -196,11 +187,12 @@ void Restaurant::start()
 }
 
 int Restaurant::getNumOfTables() const {
-    return tables.size();
+    return static_cast<int>(tables.size());
 }
 
 Table* Restaurant::getTable(int ind) {
-    if (!(ind > tables.size() || ind < 0))
+    int tablesSize = static_cast<int>(tables.size());
+    if (!(ind > tablesSize || ind < 0))
         return tables[ind];
     return nullptr;
 }
@@ -217,11 +209,11 @@ DishType Restaurant::findMyType(std::string strType)
         return VEG;
     if(strType == "SPC")
         return SPC;
-    if(strType == "BVG")
+    else
         return BVG;
 }
 
-void Restaurant::goOpen(std::string details)//TODO:Delete the customers if the table is not exist
+void Restaurant::goOpen(std::string details)
 {
     newMsg = details;
     std::vector<Customer*> customers;
@@ -237,19 +229,16 @@ void Restaurant::goOpen(std::string details)//TODO:Delete the customers if the t
     details.erase(0, pos1 + delimiterSpace.length());
 
     //get the customers
-    pos1 = 0;
     size_t pos2 = 0;
     while((pos2 = details.find(delimiterSpace)) != std::string::npos && getTable(tableId) != nullptr)
     {
         pos2 = details.find(delimiterComa);
         token1 = details.substr(0, pos2);
         details.erase(0, pos2 + delimiterComa.length());
-
         pos2 = details.find(delimiterSpace);
         token2 = details.substr(0, pos2);
         details.erase(0, pos2 + delimiterSpace.length());
-
-        if(!token1.empty() && !token2.empty() && !tables.at(tableId)->isOpen())
+        if(!token1.empty() && !token2.empty() && !tables.at(static_cast<unsigned long>(tableId))->isOpen())
         {
             Customer *newCustomer = createCustomerByType(token1, token2);
             customers.push_back(newCustomer);
@@ -258,8 +247,8 @@ void Restaurant::goOpen(std::string details)//TODO:Delete the customers if the t
             token2="";
         }
     }
-    OpenTable* open = new OpenTable(tableId, customers);
-    open->act(*this);//TODO:check here memory leak, if table does not exist
+    auto open = new OpenTable(static_cast<unsigned long>(tableId), customers);
+    open->act(*this);
     actionsLog.push_back(open);
 }
 
@@ -274,7 +263,7 @@ void Restaurant::goOrder(std::string details)
     tableId = std::stoi(token1);//get the id
     details.erase(0, pos1 + delimiterSpace.length());
 
-    Order* ord = new Order(tableId);
+    auto * ord = new Order(tableId);
     ord->act(*this);
     actionsLog.push_back(ord);
 }
@@ -303,7 +292,7 @@ void Restaurant::goMove(std::string details)
     tableId2 = std::stoi(token1);
     details.erase(0, pos1 + delimiterSpace.length());
 
-    MoveCustomer* newMove = new MoveCustomer(customerId, tableId1, tableId2);
+    auto * newMove = new MoveCustomer(customerId, tableId1, tableId2);
     newMove->act(*this);
     actionsLog.push_back(newMove);
 
@@ -319,21 +308,21 @@ void Restaurant::goClose(std::string details)
     token1 = details.substr(0,pos1);
     tableId = std::stoi(token1);
 
-    Close* newClose = new Close(tableId);
+    auto * newClose = new Close(tableId);
     newClose->act(*this);
     actionsLog.push_back(newClose);
 }
 
 void Restaurant::goCloseAll()
 {
-    CloseAll* newCloseAll = new CloseAll();
+    auto * newCloseAll = new CloseAll();
     newCloseAll->act(*this);
     actionsLog.push_back(newCloseAll);
 }
 
 void Restaurant::goMenu()
 {
-    PrintMenu* newPrintMenu = new PrintMenu();
+    auto * newPrintMenu = new PrintMenu();
     newPrintMenu->act(*this);
     actionsLog.push_back(newPrintMenu);
 }
@@ -348,21 +337,21 @@ void Restaurant::goStatus(std::string details)
     token1 = details.substr(0,pos1);
     tableId = std::stoi(token1);
 
-    PrintTableStatus* newTableStatus = new PrintTableStatus(tableId);
+    auto * newTableStatus = new PrintTableStatus(tableId);
     newTableStatus->act(*this);
     actionsLog.push_back(newTableStatus);
 }
 
 void Restaurant::goLog()
 {
-    PrintActionsLog* newLog = new PrintActionsLog();
+    auto * newLog = new PrintActionsLog();
     newLog->act(*this);
     actionsLog.push_back(newLog);
 }
 
 void Restaurant::goBackup()
 {
-    BackupRestaurant* newBackup = new BackupRestaurant();
+    auto * newBackup = new BackupRestaurant();
     actionsLog.push_back(newBackup);
     newBackup->act(*this);
 }
@@ -370,7 +359,7 @@ void Restaurant::goBackup()
 
 void Restaurant::goRestore()
 {
-    RestoreResturant* newRestore = new RestoreResturant();
+    auto * newRestore = new RestoreResturant();
     newRestore->act(*this);
     actionsLog.push_back(newRestore);
 }
@@ -383,7 +372,7 @@ Customer* Restaurant::createCustomerByType(std::string name, std::string strateg
         return new SpicyCustomer(name, nextCustomerId);
     if (strategy == "chp")
         return new CheapCustomer(name, nextCustomerId);
-    if (strategy == "alc")
+    else
         return new AlchoholicCustomer(name, nextCustomerId);
 }
 

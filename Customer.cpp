@@ -1,3 +1,13 @@
+#include <utility>
+
+#include <utility>
+
+#include <utility>
+
+#include <utility>
+
+#include <utility>
+
 //
 // Created by Amit Levizky on 11/3/18.
 //
@@ -5,7 +15,7 @@
 #include "Customer.h"
 #include <algorithm>
 //Base Customer class
-Customer::Customer(std::string c_name, int c_id) : name(c_name), id(c_id) {
+Customer::Customer(std::string c_name, int c_id) : name(std::move(c_name)), id(c_id) {
 }
 
 
@@ -18,16 +28,16 @@ int Customer::getId() const { return id;}
 
 //VegetarianCustomer class
 
-VegetarianCustomer::VegetarianCustomer(std::string name, int id) : Customer(name, id), mstExpBvg(-1), smllstIdVeg(1000), findAndLeg(false) {
+VegetarianCustomer::VegetarianCustomer(std::string name, int id) : Customer(std::move(name), id), mstExpBvg(-1), smllstIdVeg(1000), findAndLeg(false) {
 }
 
 std::vector<int> VegetarianCustomer::order(const std::vector<Dish> &menu) {
     if (!findAndLeg) {
-        for (int i = 0; i < menu.size(); ++i) {
-            if (menu[i].getType() == VEG && menu[i].getId() < smllstIdVeg)
-                smllstIdVeg = menu[i].getId();
-            if (menu[i].getType() == BVG && menu[i].getPrice() > mstExpBvg)
-                mstExpBvg = menu[i].getId();
+        for (const auto &i : menu) {
+            if (i.getType() == VEG && i.getId() < smllstIdVeg)
+                smllstIdVeg = i.getId();
+            if (i.getType() == BVG && i.getPrice() > mstExpBvg)
+                mstExpBvg = i.getId();
         }
     }
     if (mstExpBvg >= 0 && mstExpBvg <= 1000 &&  smllstIdVeg >= 0 && smllstIdVeg <= 1000)
@@ -56,17 +66,18 @@ Customer *VegetarianCustomer::clone()
 
 
 //CheapCustomer class
-CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id), ordered(false), cheapest(INT8_MAX){
+CheapCustomer::CheapCustomer(std::string name, int id) : Customer(std::move(name), id), ordered(false), cheapest(INT8_MAX){
 }
 
 std::vector<int> CheapCustomer::order(const std::vector<Dish> &menu) {
     std::vector<int> newOrd;
     if(!ordered && !menu.empty())
     {
+        int size = menu.size();
         cheapest = 0;
-        for (int i = 0; i < menu.size(); ++i)
+        for (int i = 0; i < size; ++i)
         {
-            if(menu.at(cheapest).getPrice() > menu.at(i).getPrice())
+            if(menu.at(static_cast<unsigned long>(cheapest)).getPrice() > menu.at(static_cast<unsigned long>(i)).getPrice())
                 cheapest = i;
         }
     }
@@ -86,13 +97,14 @@ Customer *CheapCustomer::clone() {
 //End of CheapCustomer class
 
 //SpicyCustomer class
-SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(name, id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX), ordered(false){
+SpicyCustomer::SpicyCustomer(std::string name, int id) : Customer(std::move(name), id), spcMstExpInx(INT8_MAX), spcPrice(-1), bvgMstChpstInx(INT8_MAX), bvgPrice(INT8_MAX), ordered(false){
 }
 
 std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
     std::vector<int> newOrd;
     if (!ordered) {
-        for (int i = 0; i < menu.size(); ++i) {
+        int size = menu.size();
+        for (int i = 0; i < size; ++i) {
             if (menu[i].getType() == SPC && menu[i].getPrice() >= spcPrice) {
                 spcPrice = menu[i].getPrice();
                 spcMstExpInx = i;
@@ -116,10 +128,11 @@ std::vector<int> SpicyCustomer::order(const std::vector<Dish> &menu) {
         newOrd.push_back(bvgMstChpstInx);
         return newOrd;
     }
+    return std::vector<int>();
 
 }
 
-std::string SpicyCustomer::toString() const {return getName() + ",spc ";}//TODO: toString
+std::string SpicyCustomer::toString() const {return getName() + ",spc ";}
 
 Customer *SpicyCustomer::clone() {
     return new SpicyCustomer(*this);
@@ -127,28 +140,31 @@ Customer *SpicyCustomer::clone() {
 
 
 // AlchoholicCustomer class
-AlchoholicCustomer::AlchoholicCustomer(std::string name, int id) : Customer(name, id) , ordered(false),minAlc(INT8_MAX), maxAlc(0), maxInx(0) , minInx(INT8_MAX){}
+AlchoholicCustomer::AlchoholicCustomer(std::string name, int id) : Customer(std::move(name), id) , maxAlc(0), maxInx(0) ,minAlc(INT8_MAX),  minInx(INT8_MAX), ordered(false){}
 
 std::vector<int>  AlchoholicCustomer::order(const std::vector<Dish> &menu)
 {
     int lastChecked = INT8_MAX;
     int lastCheckedIndex = INT8_MAX;
     std::vector<int> newOrder;
+    int size = menu.size();
     if(minInx == maxInx)
         return newOrder;
     if(!ordered)
     {
-        for (int i = 0; i < menu.size(); ++i)
+        for (int i = 0; i < size; ++i)
         {
-            if (menu.at(i).getType() == ALC && menu.at(i).getPrice() < minAlc)
+            if (menu.at(static_cast<unsigned long>(i)).getType() == ALC && menu.at(
+                    static_cast<unsigned long>(i)).getPrice() < minAlc)
             {
-                minAlc = menu.at(i).getPrice();
+                minAlc = menu.at(static_cast<unsigned long>(i)).getPrice();
                 minInx = i;
             }
 
-            if(menu.at(i).getType() == ALC && menu.at(i).getPrice() >= maxAlc)
+            if(menu.at(static_cast<unsigned long>(i)).getType() == ALC && menu.at(
+                    static_cast<unsigned long>(i)).getPrice() >= maxAlc)
             {
-                maxAlc = menu.at(i).getPrice();
+                maxAlc = menu.at(static_cast<unsigned long>(i)).getPrice();
                 maxInx = i;
             }
         }
@@ -162,23 +178,23 @@ std::vector<int>  AlchoholicCustomer::order(const std::vector<Dish> &menu)
         ordered = true;
         return newOrder;
     }
-    bool changed = false;
-    for (int i = 0; i < menu.size(); ++i)
+    for (int i = 0; i < size; ++i)
     {
-        if(menu.at(i).getPrice() >= minAlc && menu.at(i).getType() == ALC)
+        if(menu.at(static_cast<unsigned long>(i)).getPrice() >= minAlc && menu.at(
+                static_cast<unsigned long>(i)).getType() == ALC)
         {
-            if(menu.at(i).getPrice() == minAlc && minInx < i)// && !changed
+            if(menu.at(static_cast<unsigned long>(i)).getPrice() == minAlc && minInx < i)// && !changed
             {
                 minInx = i;
-                minAlc = menu.at(i).getPrice();
+                minAlc = menu.at(static_cast<unsigned long>(i)).getPrice();
                 newOrder.push_back(minInx);
                 return newOrder;
             }
-            else if(menu.at(i).getPrice() > minAlc && menu.at(i).getPrice() < lastChecked)
+            else if(menu.at(static_cast<unsigned long>(i)).getPrice() > minAlc && menu.at(
+                    static_cast<unsigned long>(i)).getPrice() < lastChecked)
             {
-                lastChecked = menu.at(i).getPrice();
+                lastChecked = menu.at(static_cast<unsigned long>(i)).getPrice();
                 lastCheckedIndex = i;
-                changed=true;
             }
         }
     }

@@ -49,7 +49,6 @@ public:
 private:
     bool ordered;
     int cheapest;
-    int chpsdIndx;
 };
 
 
@@ -79,7 +78,6 @@ public:
 private:
     int maxAlc;
     int maxInx;
-    int curr;
     int minAlc;
     int minInx;
     bool ordered;
