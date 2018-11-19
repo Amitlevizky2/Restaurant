@@ -66,8 +66,7 @@ Restaurant::Restaurant(const Restaurant &other) :open(other.open), nextCustomerI
     }
     for (int j = 0; j < other.actionsLog.size(); ++j)
     {
-        BaseAction* tempBaseAction = new;
-        actionsLog.push_back(tempBaseAction);
+        actionsLog.push_back(other.actionsLog.at(j)->clone());
     }
 }
 
@@ -81,19 +80,24 @@ Restaurant::~Restaurant()
     {
         delete(actionsLog[j]);
     }
+    tables.clear();
+    actionsLog.clear();
+    menu.clear();
 }
 
 Restaurant::Restaurant(Restaurant &&other) : open(other.open), nextCustomerId(other.nextCustomerId), tables(std::move(other.tables)), actionsLog(std::move(other.actionsLog)), menu(std::move(other.menu))
 {
     other.tables.clear();
     other.actionsLog.clear();
-}//TODO::to be complete
+    other.menu.clear();
+}
 
 Restaurant &Restaurant::operator=(const Restaurant &other) {
     if (this == &other)
         return *this;
     open = other.open;
     nextCustomerId=other.nextCustomerId;
+
     for (int i = 0; i < other.tables.size(); ++i)
     {
         delete tables[i];
@@ -106,7 +110,7 @@ Restaurant &Restaurant::operator=(const Restaurant &other) {
         tables.push_back(newTable);
     }
 
-    for (int k = 0; k < other.actionsLog.size(); ++k)
+    for (int k = 0; k < actionsLog.size(); ++k)
     {
         delete actionsLog[k];
     }
@@ -115,6 +119,12 @@ Restaurant &Restaurant::operator=(const Restaurant &other) {
     for (int l = 0; l < other.actionsLog.size(); ++l)
     {
         actionsLog.push_back(other.actionsLog[l]->clone());
+    }
+
+    menu.clear();
+    for (int m = 0; m < other.menu.size(); ++m)
+    {
+        menu.push_back(other.menu.at(m));
     }
 }
 
@@ -353,8 +363,8 @@ void Restaurant::goLog()
 void Restaurant::goBackup()
 {
     BackupRestaurant* newBackup = new BackupRestaurant();
-    newBackup->act(*this);
     actionsLog.push_back(newBackup);
+    newBackup->act(*this);
 }
 
 

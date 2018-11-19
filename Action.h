@@ -38,9 +38,9 @@ private:
 class OpenTable : public BaseAction {
 public:
     OpenTable(int id, std::vector<Customer *> &customersList);
-    OpenTable(const OpenTable& other);
+    //OpenTable(const OpenTable& other);
     virtual ~OpenTable() = default;
-    OpenTable(OpenTable&& other);
+    //OpenTable(OpenTable&& other);
     BaseAction *clone() override;
     void act(Restaurant &restaurant) override;
     std::string toString() const override;
