@@ -52,14 +52,14 @@ string representation of the action; A flag which stores the current status of t
 actions, and “Error” for actions which couldn't be completed.
 
 # Built With
-- OOP
-- Rule Of Five
+- [OOP](https://en.wikipedia.org/wiki/Object-oriented_programming)
+- [Rule Of Five](https://en.wikipedia.org/wiki/Rule_of_three_(C%2B%2B_programming)#Rule_of_Five)
 
 ### Tech
-* C++ 
-* CLion
-* Valgrind
-* Github
+* [C++](https://www.cplusplus.com/)
+* [CLion](https://www.jetbrains.com/clion/)
+* [Valgrind](https://valgrind.org/)
+* [Github](https://github.com/)
 
 ### Authors
 * Amit Levizky
